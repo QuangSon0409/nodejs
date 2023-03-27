@@ -22,14 +22,22 @@
 //   { nam: "product2", id: 2 },
 // ];
 
-import axios from "axios";
 import express from "express";
 import productRouter from "./routes/product";
+import cors from "cors";
+import mongoose from "mongoose";
+mongoose.connect("mongodb://127.0.0.1:27017/we17307");
 const app = express();
+
+// middlewear
+
+app.use(express.json());
+app.use(cors());
+
 app.use("/api", productRouter);
 
-app.use(express.json()); // middelwear
+// app.listen(8080, () => {
+//   console.log("server is running on port 8080");
+// });
 
-app.listen(8080, () => {
-  console.log("server is running on port 8080");
-});
+export const viteNodeApp = app;
