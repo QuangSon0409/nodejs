@@ -24,6 +24,7 @@
 
 import express from "express";
 import productRouter from "./routes/product";
+import authRouter from "./routes/auth";
 import cors from "cors";
 import mongoose from "mongoose";
 mongoose.connect("mongodb://127.0.0.1:27017/we17307");
@@ -35,6 +36,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api", productRouter);
+app.use("/api", authRouter);
 
 // app.listen(8080, () => {
 //   console.log("server is running on port 8080");

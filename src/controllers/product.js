@@ -1,5 +1,5 @@
 import axios from "axios";
-import Product from "../../model/products";
+import Product from "../model/products";
 
 export const getAll = async (req, res) => {
   try {
