@@ -4,7 +4,7 @@ import Product from "../model/products";
 export const getAll = async (req, res) => {
   try {
     const products = await Product.find({});
-    if (product.length === 0) {
+    if (products.length === 0) {
       res.status(404).json({
         message: "Không có sản phẩm nào",
       });

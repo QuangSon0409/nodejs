@@ -1,4 +1,4 @@
-import { jwt } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import User from "../model/auth";
 import { signinSchema, signupSchema } from "../schemas/auth";
 import bcrypt from "bcryptjs";
@@ -29,7 +29,7 @@ export const signup = async (req, res) => {
       password: hashedPassword,
     });
     const token = jwt.sign({ id: user._id }, "banThayDat", {
-      expiresInt: "1d",
+      expiresIn: "1d",
     });
     user.password = undefined;
     return res.status(201).json({
@@ -59,6 +59,7 @@ export const signin = async (req, res) => {
     }
     // kieemt tra email có tồn tại không
     const user = await User.findOne({ email: req.body.email });
+    console.log(user);
     if (!user) {
       res.status(400).json({
         message: "Email không có tồn tại",
@@ -66,19 +67,27 @@ export const signin = async (req, res) => {
     }
     // so sánh password client gửi lên với password trong db
     const isMatch = await bcrypt.compare(req.body.password, user.password);
+
     if (!isMatch) {
       req.status(400).json({
         message: "Sai mật khẩu",
       });
     }
-    const token = jwt.sign({ id: user._id }, "banThayDat", { expiresIn: "1d" });
+    const token = jwt.sign({ id: user._id }, "banThayDat", {
+      expiresIn: "1d",
+    });
+    console.log(token);
     user.password = undefined;
     return res.json({
       message: "Đăng nhập thành công",
       token: token,
       user,
     });
-  } catch (error) {}
+  } catch (error) {
+    res.json({
+      message: "nhu cc",
+    });
+  }
 };
 // bước 1: kiểm tra xem user có hợp lệ không
 // bước 2: kiểm tra email có tồn tại không
