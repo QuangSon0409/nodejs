@@ -1,6 +1,6 @@
 import { jwt } from "jsonwebtoken";
 import User from "../model/auth";
-import { signupSchema } from "../schemas/auth";
+import { signinSchema, signupSchema } from "../schemas/auth";
 import bcrypt from "bcryptjs";
 export const signup = async (req, res) => {
   try {
@@ -46,7 +46,40 @@ export const signup = async (req, res) => {
 // bước 5: tạo token cho user
 // bước 6: trả về phía client
 
-export const signin = () => {};
+export const signin = async (req, res) => {
+  try {
+    // kiểm tra xem user có hợp lý không
+    const { error } = signinSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+      const errors = error.details.map((err) => err.message);
+
+      return res.status(400).json({
+        messages: errors,
+      });
+    }
+    // kieemt tra email có tồn tại không
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      res.status(400).json({
+        message: "Email không có tồn tại",
+      });
+    }
+    // so sánh password client gửi lên với password trong db
+    const isMatch = await bcrypt.compare(req.body.password, user.password);
+    if (!isMatch) {
+      req.status(400).json({
+        message: "Sai mật khẩu",
+      });
+    }
+    const token = jwt.sign({ id: user._id }, "banThayDat", { expiresIn: "1d" });
+    user.password = undefined;
+    return res.json({
+      message: "Đăng nhập thành công",
+      token: token,
+      user,
+    });
+  } catch (error) {}
+};
 // bước 1: kiểm tra xem user có hợp lệ không
 // bước 2: kiểm tra email có tồn tại không
 // B2.1: So sánh password client với password trong db
