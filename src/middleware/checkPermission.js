@@ -9,8 +9,21 @@ export const checkPermission = async (req, res, next) => {
     });
   }
 
-  jwt.verify(token, "banThayDat", async (err, payload) => {
+  jwt.verify(token, "banThayDat", async (error, payload) => {
+    if (error) {
+      if (error.name === "JsonWebTokenError") {
+        return res.status(400).json({
+          message: "Token không hợp lệ",
+        });
+      }
+      if (error.name === "TokenExpiredError") {
+        return res.status(400).json({
+          message: "Token đã hết hạn",
+        });
+      }
+    }
     const user = await User.findById(payload.id);
+    console.log(user);
     if (user.role !== "admin") {
       return res.json({
         message: "bạn không thể thực hiện chức năng này",
